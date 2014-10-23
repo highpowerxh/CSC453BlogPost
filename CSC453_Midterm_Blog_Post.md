@@ -1,13 +1,11 @@
 # CSC453 Midterm Blog Post
-<!-- MarkdownTOC -->
 
-- [Topic][topic]
-- [Example Python code][example-python-code]
-- [Purpose][purpose]
-- [Execution][execution]
-
-<!-- /MarkdownTOC -->
-
+- [Topic](#topic)
+- [Example Python code](#example-python-code)
+- [Purpose](#purpose)
+- [Execution](#execution)
+  - [MAKE_FUNCTION](#make_function)
+  - [CALL_FUNCTION](#call_function)
 
 ## Topic
 Calling a function with some integer arguments and having that function return an integer.
@@ -44,7 +42,7 @@ The human-friendly disassambled bytecode is:
 
 ## Purpose
 Via this example we want to go through how user-defined funtions work in the interpreter.
-So the Highlight part should be `MAKE_FUNCTION` and `CALL_FUNCTION`
+So the Highlight part should be [`MAKE_FUNCTION`](#make_function) and [`CALL_FUNCTION`](#call_function)
 
 ## Execution
 1. In the main loop of the interpreter, it will simply load the code object (`LOAD_CONST`) which is stored in
@@ -64,7 +62,7 @@ Then, Python will create a function object (`MAKE_FUNCTION`) and bind it to the 
 >>> c.co_names
 ('foo',)
 ```
-Lets dive into the `MAKE_FUNCTION`
+Lets dive into the [`MAKE_FUNCTION`](#make_function)
 
 ### MAKE_FUNCTION
 Here's the code in the iterpreter:
