@@ -1,17 +1,18 @@
 # CSC453 Midterm Blog Post
 <!-- MarkdownTOC -->
 
-- Topic
--  Example Python code
-- Purpose
-- Execution
+- [Topic][topic]
+- [Example Python code][example-python-code]
+- [Purpose][purpose]
+- [Execution][execution]
 
 <!-- /MarkdownTOC -->
+
 
 ## Topic
 Calling a function with some integer arguments and having that function return an integer.
 
-##  Example Python code
+## Example Python code
 Now, let's start with the following code snippet **test.py**:
 ```Python
 def foo(intnum):
