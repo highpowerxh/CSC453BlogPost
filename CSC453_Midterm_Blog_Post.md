@@ -1,4 +1,5 @@
 # CSC453 Midterm Blog Post
+## Table of Content
 
 - [Topic](#topic)
 - [Example Python code](#example-python-code)
@@ -45,7 +46,7 @@ Via this example we want to go through how user-defined funtions work in the int
 So the Highlight part should be [`MAKE_FUNCTION`](#make_function) and [`CALL_FUNCTION`](#call_function)
 
 ## Execution
-1. In the main loop of the interpreter, it will simply load the code object (`LOAD_CONST`) which is stored in
+1.In the main loop of the interpreter, it will simply load the code object (`LOAD_CONST`) which is stored in
 ```Python
 >>> test_obj.co_consts
 (<code object foo at 0x1004b9830, file "test.py", line 1>, 5, None)
@@ -53,7 +54,7 @@ So the Highlight part should be [`MAKE_FUNCTION`](#make_function) and [`CALL_FUN
 Note the code object we load here is different from _test_obj_.
 Let's call it _foo_obj_:
 ```Python
->>> foo_obj = c.co_consts[0]
+>>> foo_obj = test_obj.co_consts[0]
 >>> foo_obj
 <code object foo at 0x1005b9830, file "test.py", line 1>
 ```
@@ -64,7 +65,7 @@ The disassbly of the code is:
 ```
 Then, Python will create a function object (`MAKE_FUNCTION`) and bind it to the name _foo_ in _co_names_ and push it into the value stack(`STORE_NAME`).
 ```Python
->>> c.co_names
+>>> test_obj.co_names
 ('foo',)
 ```
 Lets dive into the [`MAKE_FUNCTION`](#make_function)
@@ -82,29 +83,26 @@ case MAKE_FUNCTION:
             break;
 ...
 ```
+In the main interpreter loop, it will call `PyFunction_New` with _foo_obj_ and the _globals_ of the current frame.
 ```C
 //funcobject.c: PyFunction_New(PyObject *code, PyObject *globals)
-    ...
+    PyFunctionObject *op = PyObject_GC_New(PyFunctionObject,&PyFunction_Type);
+    static PyObject *__name__ = 0;
     if (op != NULL) {
         ...
         Py_INCREF(code);
-        op->func_code = code;
+        op->func_code = code;// CSC253: assign code
         Py_INCREF(globals);
-        op->func_globals = globals;
-        op->func_name = ((PyCodeObject *)code)->co_name;
+        op->func_globals = globals;// CSC253: copy globals
+        op->func_name = ((PyCodeObject *)code)->co_name;// CSC253: copy function name
         Py_INCREF(op->func_name);
         op->func_defaults = NULL; /* No default arguments */
         op->func_closure = NULL;
-        consts = ((PyCodeObject *)code)->co_consts;
+        consts = ((PyCodeObject *)code)->co_consts;// CSC253: copy constants
         ...
-        module = PyDict_GetItem(globals, __name__);
-        if (module) {
-            Py_INCREF(module);
-            op->func_module = module;
-        }
     }
     ...
     return (PyObject *)op;
 ```
-In the main interpreter loop, it will call `PyFunction_New` with _foo_obj_ and the _globals_ of the current frame.
+Here, `PyFunction_New` will assign the code in _foo_obj_ to the new PyFuntionObject, and copy the function name _foo_ from the code, which is stored in _foo_obj_'s _co_name_, as well as the constants from _foo_obj_'s _co_consts_
 ### CALL_FUNCTION
