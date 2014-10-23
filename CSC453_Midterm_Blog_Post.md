@@ -85,24 +85,22 @@ case MAKE_FUNCTION:
 ```
 In the main interpreter loop, it will call `PyFunction_New` with _foo_obj_ and the _globals_ of the current frame.
 ```C
-//funcobject.c: PyFunction_New(PyObject *code, PyObject *globals)
-    PyFunctionObject *op = PyObject_GC_New(PyFunctionObject,&PyFunction_Type);
-    static PyObject *__name__ = 0;
-    if (op != NULL) {
-        ...
-        Py_INCREF(code);
-        op->func_code = code;// CSC253: assign code
-        Py_INCREF(globals);
-        op->func_globals = globals;// CSC253: copy globals
-        op->func_name = ((PyCodeObject *)code)->co_name;// CSC253: copy function name
-        Py_INCREF(op->func_name);
-        op->func_defaults = NULL; /* No default arguments */
-        op->func_closure = NULL;
-        consts = ((PyCodeObject *)code)->co_consts;// CSC253: copy constants
-        ...
-    }
+//funcobject.c: PyFunction_New(PyObject *code, PyObject *globals) *reference count related code are omited here
+PyFunctionObject *op = PyObject_GC_New(PyFunctionObject,&PyFunction_Type);
+static PyObject *__name__ = 0;
+if (op != NULL) {
     ...
-    return (PyObject *)op;
+    op->func_code = code;// CSC253: assign code
+    op->func_globals = globals;// CSC253: copy globals
+    op->func_name = ((PyCodeObject *)code)->co_name;// CSC253: copy function name
+    op->func_defaults = NULL; /* No default arguments */
+    op->func_closure = NULL;
+    consts = ((PyCodeObject *)code)->co_consts;// CSC253: copy constants
+    ...
+}
+...
+return (PyObject *)op;
 ```
-Here, `PyFunction_New` will assign the code in _foo_obj_ to the new PyFuntionObject, and copy the function name _foo_ from the code, which is stored in _foo_obj_'s _co_name_, as well as the constants from _foo_obj_'s _co_consts_
+Here, `PyFunction_New` will grab the code we got from _foo_obj_ and fill it into our new PyFuntionObject _op_, then copy the function name _foo_ which is stored in _foo_obj_'s _co_name_, as well as the constants stored in _foo_obj_'s _co_consts_
+After some checks which are unimportant here. This function call will return _op_ and the interpreter will push it into the value stack
 ### CALL_FUNCTION
