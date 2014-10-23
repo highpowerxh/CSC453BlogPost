@@ -57,6 +57,11 @@ Let's call it _foo_obj_:
 >>> foo_obj
 <code object foo at 0x1005b9830, file "test.py", line 1>
 ```
+The disassbly of the code is:
+```Python
+  2           0 LOAD_FAST                0 (intnum)
+              3 RETURN_VALUE
+```
 Then, Python will create a function object (`MAKE_FUNCTION`) and bind it to the name _foo_ in _co_names_ and push it into the value stack(`STORE_NAME`).
 ```Python
 >>> c.co_names
