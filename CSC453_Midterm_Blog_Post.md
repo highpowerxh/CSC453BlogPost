@@ -9,6 +9,7 @@
   - [CALL_FUNCTION](#call_function)
   - [LOAD_FAST](#load_fast)
   - [POP_TOP](#pop_top)
+- [Conclusion](#conclusion)
 
 ## Topic
 Calling a function with some integer arguments and having that function return an integer.
@@ -128,7 +129,8 @@ case CALL_FUNCTION:
 ...
 }
 ```
-The stack pointer will save and restore after calling function.
+The stack pointer will save and restore after calling function, which will record the position in the 'main' function to resume after calling another function.
+
 Let's step into `call_function()`:
 ```C
 static PyObject *
@@ -152,7 +154,8 @@ call_function(PyObject ***pp_stack, int oparg)
 }
 ```
 Basically, pfunc will point to the position of function object. Then it will check if this function is build-in or not. In our case, it's not build-in so it calls `fast_function()`. In the end, any object related to this function will be removed from the stack.
-fast_function is the real function processing the call:
+
+`fast_function` is the real function processing the call:
 ```C
 static PyObject *
 fast_function(PyObject *func, PyObject ***pp_stack, int n, int na, int nk)
@@ -173,7 +176,8 @@ fast_function(PyObject *func, PyObject ***pp_stack, int n, int na, int nk)
 }
 ```
 A new frame will be created for this function and any arguments will be put into fastlocals waiting for next `LOAD_FAST` operation. `PyEval_EvalFrameEx()` will be called to execute _foo_ function.
-Finally, the result 5 will be put on the top of the stack. 
+
+Finally, the result _5_ will be put on the top of the stack. 
 ### LOAD_FAST
 Then let's look at what Python did during the execution of `foo(5)`:
 ```Python
@@ -189,8 +193,9 @@ case LOAD_FAST:
          goto fast_next_opcode;
      }
 ```
-This instruction directly fetches constant '5' from fastlocals where we store 5 in the previous fast_function().
-It's faster than LOAD_CONST.
+This instruction directly fetches constant _5_ from fastlocals where we store _5_ in the previous `fast_function()`.
+
+It's faster than `LOAD_CONST`.
 ### POP_TOP
 Here I want to explain how come is this wierd `POP_TOP` instead of talking how it works.
 
@@ -203,3 +208,7 @@ To make it clear, we change our code to `a = foo(5)`, the bytecode will become:
 21 LOAD_CONST               2 (None)
 ```
 Instead of poping the value, the interpreter stored that value with a name.
+## Conclusion
+The interpreter will eval a block of code within a frame. When we deined a function, the interpreter just make a function object from the code and do nothing but store that in the value stack. When we call the function, the interpreter will grab the function object and put that into a frame, then throw it to the interpreter.
+
+it's a bit of like nested calling `PyEval_EvalFrameEx()`.
