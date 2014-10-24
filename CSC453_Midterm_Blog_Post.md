@@ -101,6 +101,86 @@ if (op != NULL) {
 ...
 return (PyObject *)op;
 ```
-Here, `PyFunction_New` will grab the code we got from _foo_obj_ and fill it into our new PyFuntionObject _op_, then copy the function name _foo_ which is stored in _foo_obj_'s _co_name_, as well as the constants stored in _foo_obj_'s _co_consts_
-After some checks which are unimportant here. This function call will return _op_ and the interpreter will push it into the value stack
+Here, `PyFunction_New` will grab the code we got from _foo_obj_ and fill it into our new PyFuntionObject _op_, then copy the function name _foo_ which is stored in _foo_obj_'s _co_name_, as well as the constants stored in _foo_obj_'s _co_consts_.
+After some checks which are unimportant here. This function call will return _op_ and the interpreter will push it into the value stack.
+So basically, the code of a user-defined function is stored saperately with the 'main' function. It will be packaged into a code object and stored together with other constants in the program. It's kind of like the function once defined, it become just like a constants that won't be altered later.
+When it come to execution, the code object itself could not be execuated. The interpreter will make a executable function object that represent the code object. Somehow, like the relation between Class and Instance.
 ### CALL_FUNCTION
+Before we step into call_function, we have already done 
+```Python
+9 LOAD_NAME                0 (foo)
+12 LOAD_CONST               1 (5)
+```
+Remember the top of stack will be "5" -> "foo".  Then we go for call_function case:
+```Python
+case CALL_FUNCTION:
+{   
+    ...
+    sp = stack_pointer;// CSC253: Save the stack pointer
+    x = call_function(&sp, oparg);// CSC253: oparg = 1  (intnum)
+    stack_pointer = sp;// CSC253: Restore the stack pointer
+    PUSH(x);
+	...
+}
+```
+Let's step into call_function():
+```C
+static PyObject *
+call_function(PyObject ***pp_stack, int oparg)
+{
+	...
+    PyObject **pfunc = (*pp_stack) - n - 1;// CSC253: skip args and get function "foo" (n is the number of args)
+    if (PyCFunction_Check(func) && nk == 0) {
+        ...// CSC253: If func is build-in func, it goes through here.
+    } else {
+        ...
+            x = fast_function(func, pp_stack, n, na, nk);// CSC253: We step into this func
+        ...
+    }
+    // CSC253: Clear the stack of the function object. 
+    while ((*pp_stack) > pfunc) {
+        w = EXT_POP(*pp_stack);// CSC253: (*--(*pp_stack))
+		...
+    }
+    return x;
+}
+```
+fast_function is the real function processing the call:
+```C
+static PyObject *
+fast_function(PyObject *func, PyObject ***pp_stack, int n, int na, int nk)
+{
+    PyCodeObject *co = (PyCodeObject *)PyFunction_GET_CODE(func);// CSC253: Get "foo" code
+    PyObject *globals = PyFunction_GET_GLOBALS(func);// CSC253: Get global variables
+    PyObject *argdefs = PyFunction_GET_DEFAULTS(func);// CSC253: Default args. NULL here
+        ...
+        f = PyFrame_New(tstate, co, globals, NULL);// CSC253: Create a new frame object
+        stack = (*pp_stack) - n;// CSC253: Point to the first argument.
+        for (i = 0; i < n; i++) {// CSC253: Put argument(constant 5) into fastlocals 
+            fastlocals[i] = *stack++;
+        }
+        retval = PyEval_EvalFrameEx(f,0);// CSC253: Execute "foo" function.
+        return retval;
+    }
+    ...
+}
+```
+After evaluation, any information related to the "foo" on the stack will be cleared and the result 5 will be put on the top of the stack. 
+Then let's look at what Python did during the execution of "foo(5)":
+```Python
+  2           0 LOAD_FAST                0 (intnum)
+              3 RETURN_VALUE  
+```
+```C
+case LOAD_FAST:
+     x = GETLOCAL(oparg);
+     if (x != NULL) {
+         Py_INCREF(x);
+         PUSH(x);
+         goto fast_next_opcode;
+     }
+     format_exc_check_arg(PyExc_UnboundLocalError,
+         UNBOUNDLOCAL_ERROR_MSG,
+         PyTuple_GetItem(co->co_varnames, oparg));
+     break;
+```
