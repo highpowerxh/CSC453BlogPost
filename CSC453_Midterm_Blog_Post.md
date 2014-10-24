@@ -8,6 +8,7 @@
   - [MAKE_FUNCTION](#make_function)
   - [CALL_FUNCTION](#call_function)
   - [LOAD_FAST](#load_fast)
+  - [POP_TOP](#pop_top)
 
 ## Topic
 Calling a function with some integer arguments and having that function return an integer.
@@ -110,12 +111,12 @@ So basically, the code of a user-defined function is stored saperately with the 
 
 When it come to execution, the code object itself could not be execuated. The interpreter will make a executable function object that represent the code object. Somehow, like the relation between Class and Instance.
 ### CALL_FUNCTION
-Before we step into call_function, we have already done 
+Before we step into `CALL_FUNCTION`, we have already done 
 ```Python
 9 LOAD_NAME                0 (foo)
 12 LOAD_CONST               1 (5)
 ```
-Remember the top of stack will be "5" -> "foo".  Then we go for call_function case:
+Remember the top of stack will be _5_ -> _foo_.  Then we go for `CALL_FUNCTION` case:
 ```C
 case CALL_FUNCTION:
 {   
@@ -128,7 +129,7 @@ case CALL_FUNCTION:
 }
 ```
 The stack pointer will save and restore after calling function.
-Let's step into call_function():
+Let's step into `call_function()`:
 ```C
 static PyObject *
 call_function(PyObject ***pp_stack, int oparg)
@@ -150,7 +151,7 @@ call_function(PyObject ***pp_stack, int oparg)
     return x;
 }
 ```
-Basically, pfunc will point to the position of function object. Then it will check if this function is build-in or not. In our case, it's not build-in so it calls fast_function(). In the end, any object related to this function will be removed from the stack.
+Basically, pfunc will point to the position of function object. Then it will check if this function is build-in or not. In our case, it's not build-in so it calls `fast_function()`. In the end, any object related to this function will be removed from the stack.
 fast_function is the real function processing the call:
 ```C
 static PyObject *
@@ -171,10 +172,10 @@ fast_function(PyObject *func, PyObject ***pp_stack, int n, int na, int nk)
     ...
 }
 ```
-A new frame will be created for this function and any arguments will be put into fastlocals waiting for next LOAD_FAST operation. PyEval_EvalFrameEx() will be called to execute 'foo' function.
+A new frame will be created for this function and any arguments will be put into fastlocals waiting for next `LOAD_FAST` operation. `PyEval_EvalFrameEx()` will be called to execute _foo_ function.
 Finally, the result 5 will be put on the top of the stack. 
 ### LOAD_FAST
-Then let's look at what Python did during the execution of "foo(5)":
+Then let's look at what Python did during the execution of `foo(5)`:
 ```Python
   2           0 LOAD_FAST                0 (intnum)
               3 RETURN_VALUE  
@@ -190,3 +191,15 @@ case LOAD_FAST:
 ```
 This instruction directly fetches constant '5' from fastlocals where we store 5 in the previous fast_function().
 It's faster than LOAD_CONST.
+### POP_TOP
+Here I want to explain how come is this wierd `POP_TOP` instead of talking how it works.
+
+Recall our code `foo(5)`, we didn't make use of the return value of `foo(5)`, which would become a garbage once it returned. However the [`CALL_FUNCTION`](#call_function) will push that value into value stack, so the interpreter will simply pop that out, decrease the refcount, so the GC modual can do its job.
+
+To make it clear, we change our code to `a = foo(5)`, the bytecode will become:
+```Python
+15 CALL_FUNCTION            1
+18 STORE_NAME               1 (a)
+21 LOAD_CONST               2 (None)
+```
+Instead of poping the value, the interpreter stored that value with a name.
