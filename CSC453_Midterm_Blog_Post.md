@@ -85,7 +85,7 @@ case MAKE_FUNCTION:
 ```
 In the main interpreter loop, it will call `PyFunction_New` with _foo_obj_ and the _globals_ of the current frame.
 ```C
-//funcobject.c: PyFunction_New(PyObject *code, PyObject *globals) *reference count related code are omited here
+//funcobject.c: PyFunction_New(PyObject *code, PyObject *globals) *ref count related code are omited here
 PyFunctionObject *op = PyObject_GC_New(PyFunctionObject,&PyFunction_Type);
 static PyObject *__name__ = 0;
 if (op != NULL) {
@@ -102,8 +102,11 @@ if (op != NULL) {
 return (PyObject *)op;
 ```
 Here, `PyFunction_New` will grab the code we got from _foo_obj_ and fill it into our new PyFuntionObject _op_, then copy the function name _foo_ which is stored in _foo_obj_'s _co_name_, as well as the constants stored in _foo_obj_'s _co_consts_.
+
 After some checks which are unimportant here. This function call will return _op_ and the interpreter will push it into the value stack.
+
 So basically, the code of a user-defined function is stored saperately with the 'main' function. It will be packaged into a code object and stored together with other constants in the program. It's kind of like the function once defined, it become just like a constants that won't be altered later.
+
 When it come to execution, the code object itself could not be execuated. The interpreter will make a executable function object that represent the code object. Somehow, like the relation between Class and Instance.
 ### CALL_FUNCTION
 Before we step into call_function, we have already done 
