@@ -1,4 +1,6 @@
 # CSC453 Midterm Blog Post
+**10/24**/2014  
+[Hao Xu](http://highpower.me) & Xi Jin
 ## Table of Content
 
 - [Topic](#topic)
