@@ -47,7 +47,7 @@ Via this example we want to go through how user-defined funtions work in the int
 So the Highlight part should be [`MAKE_FUNCTION`](#make_function) and [`CALL_FUNCTION`](#call_function)
 
 ## Execution
-1.In the main loop of the interpreter, it will simply load the code object (`LOAD_CONST`) which is stored in
+In the main loop of the interpreter, it will simply load the code object (`LOAD_CONST`) which is stored in
 ```Python
 >>> test_obj.co_consts
 (<code object foo at 0x1004b9830, file "test.py", line 1>, 5, None)
@@ -77,11 +77,11 @@ Here's the code in the iterpreter:
 //ceval.c
 ...
 case MAKE_FUNCTION:
-            v = POP(); /* code object */
-            x = PyFunction_New(v, f->f_globals);
-            ...
-            PUSH(x);
-            break;
+     v = POP(); /* code object */
+     x = PyFunction_New(v, f->f_globals);
+     ...
+     PUSH(x);
+     break;
 ...
 ```
 In the main interpreter loop, it will call `PyFunction_New` with _foo_obj_ and the _globals_ of the current frame.
@@ -117,15 +117,15 @@ Before we step into call_function, we have already done
 ```
 Remember the top of stack will be "5" -> "foo".  Then we go for call_function case:
 ```C
-        case CALL_FUNCTION:
-	    {   
-		    ...
-            sp = stack_pointer;// CSC253: Save the stack pointer
-            x = call_function(&sp, oparg);// CSC253: oparg = 1  (intnum)
-            stack_pointer = sp;// CSC253: Restore the stack pointer
-            PUSH(x);
-			...
-        }
+case CALL_FUNCTION:
+{   
+...
+    sp = stack_pointer;// CSC253: Save the stack pointer
+    x = call_function(&sp, oparg);// CSC253: oparg = 1  (intnum)
+    stack_pointer = sp;// CSC253: Restore the stack pointer
+    PUSH(x);
+...
+}
 ```
 The stack pointer will save and restore after calling function.
 Let's step into call_function():
@@ -133,8 +133,8 @@ Let's step into call_function():
 static PyObject *
 call_function(PyObject ***pp_stack, int oparg)
 {
-	...
-    PyObject **pfunc = (*pp_stack) - n - 1;// CSC253: skip args and get function "foo" (n is the number of args)
+	  ...
+    PyObject **pfunc = (*pp_stack) - n - 1;// CSC253: skip args and get function "foo" (n is the num of args)
     if (PyCFunction_Check(func) && nk == 0) {
         ...// CSC253: If func is build-in func, it goes through here.
     } else {
@@ -180,13 +180,13 @@ Then let's look at what Python did during the execution of "foo(5)":
               3 RETURN_VALUE  
 ```
 ```C
-       case LOAD_FAST:
-            x = GETLOCAL(oparg);// CSC253:fastlocals[0] = 5
-            if (x != NULL) {
-                Py_INCREF(x);
-                PUSH(x);
-                goto fast_next_opcode;
-            }
+case LOAD_FAST:
+     x = GETLOCAL(oparg);// CSC253:fastlocals[0] = 5
+     if (x != NULL) {
+         Py_INCREF(x);
+         PUSH(x);
+         goto fast_next_opcode;
+     }
 ```
 This instruction directly fetches constant '5' from fastlocals where we store 5 in the previous fast_function().
 It's faster than LOAD_CONST.
