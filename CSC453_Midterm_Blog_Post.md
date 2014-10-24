@@ -7,6 +7,7 @@
 - [Execution](#execution)
   - [MAKE_FUNCTION](#make_function)
   - [CALL_FUNCTION](#call_function)
+  - [LOAD_FAST](#load_fast)
 
 ## Topic
 Calling a function with some integer arguments and having that function return an integer.
@@ -115,17 +116,18 @@ Before we step into call_function, we have already done
 12 LOAD_CONST               1 (5)
 ```
 Remember the top of stack will be "5" -> "foo".  Then we go for call_function case:
-```Python
-case CALL_FUNCTION:
-{   
-    ...
-    sp = stack_pointer;// CSC253: Save the stack pointer
-    x = call_function(&sp, oparg);// CSC253: oparg = 1  (intnum)
-    stack_pointer = sp;// CSC253: Restore the stack pointer
-    PUSH(x);
-	...
-}
+```C
+        case CALL_FUNCTION:
+	    {   
+		    ...
+            sp = stack_pointer;// CSC253: Save the stack pointer
+            x = call_function(&sp, oparg);// CSC253: oparg = 1  (intnum)
+            stack_pointer = sp;// CSC253: Restore the stack pointer
+            PUSH(x);
+			...
+        }
 ```
+The stack pointer will save and restore after calling function.
 Let's step into call_function():
 ```C
 static PyObject *
@@ -148,6 +150,7 @@ call_function(PyObject ***pp_stack, int oparg)
     return x;
 }
 ```
+Basically, pfunc will point to the position of function object. Then it will check if this function is build-in or not. In our case, it's not build-in so it calls fast_function(). In the end, any object related to this function will be removed from the stack.
 fast_function is the real function processing the call:
 ```C
 static PyObject *
@@ -168,22 +171,22 @@ fast_function(PyObject *func, PyObject ***pp_stack, int n, int na, int nk)
     ...
 }
 ```
-After evaluation, any information related to the "foo" on the stack will be cleared and the result 5 will be put on the top of the stack. 
+A new frame will be created for this function and any arguments will be put into fastlocals waiting for next LOAD_FAST operation. PyEval_EvalFrameEx() will be called to execute 'foo' function.
+Finally, the result 5 will be put on the top of the stack. 
+### LOAD_FAST
 Then let's look at what Python did during the execution of "foo(5)":
 ```Python
   2           0 LOAD_FAST                0 (intnum)
               3 RETURN_VALUE  
 ```
 ```C
-case LOAD_FAST:
-     x = GETLOCAL(oparg);
-     if (x != NULL) {
-         Py_INCREF(x);
-         PUSH(x);
-         goto fast_next_opcode;
-     }
-     format_exc_check_arg(PyExc_UnboundLocalError,
-         UNBOUNDLOCAL_ERROR_MSG,
-         PyTuple_GetItem(co->co_varnames, oparg));
-     break;
+       case LOAD_FAST:
+            x = GETLOCAL(oparg);// CSC253:fastlocals[0] = 5
+            if (x != NULL) {
+                Py_INCREF(x);
+                PUSH(x);
+                goto fast_next_opcode;
+            }
 ```
+This instruction directly fetches constant '5' from fastlocals where we store 5 in the previous fast_function().
+It's faster than LOAD_CONST.
