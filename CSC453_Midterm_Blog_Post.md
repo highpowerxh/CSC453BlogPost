@@ -211,4 +211,4 @@ Instead of poping the value, the interpreter stored that value with a name.
 ## Conclusion
 The interpreter will eval a block of code within a frame. When we deined a function, the interpreter just make a function object from the code and do nothing but store that in the value stack. When we call the function, the interpreter will grab the function object and put that into a frame, then throw it to the interpreter.
 
-it's a bit of like nested calling `PyEval_EvalFrameEx()`.
+It's a bit of like nested calling `PyEval_EvalFrameEx()`.
