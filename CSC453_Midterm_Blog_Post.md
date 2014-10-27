@@ -48,7 +48,7 @@ The human-friendly disassambled bytecode is:
 
 ## Purpose
 Via this example we want to go through how user-defined funtions work in the interpreter.
-So the Highlight part should be [`MAKE_FUNCTION`](#make_function) and [`CALL_FUNCTION`](#call_function)
+So the highlighted part should be [`MAKE_FUNCTION`](#make_function) and [`CALL_FUNCTION`](#call_function)
 
 ## Execution
 In the main loop of the interpreter, it will simply load the code object (`LOAD_CONST`) which is stored in
@@ -110,9 +110,9 @@ Here, `PyFunction_New` will grab the code we got from _foo_obj_ and fill it into
 
 After some checks which are unimportant here. This function call will return _op_ and the interpreter will push it into the value stack.
 
-So basically, the code of a user-defined function is stored saperately with the 'main' function. It will be packaged into a code object and stored together with other constants in the program. It's kind of like the function once defined, it become just like a constants that won't be altered later.
+So basically, the code of a user-defined function is stored separately with the 'main' function. It will be packaged into a code object and stored together with other constants in the program. It's kind of like the function once defined, it become just like a constants that won't be altered later.
+When it comes to execution, the code object itself could not be executed. The interpreter will make a executable function object that represent the code object. Somehow, like the relation between Class and Instance.
 
-When it come to execution, the code object itself could not be execuated. The interpreter will make a executable function object that represent the code object. Somehow, like the relation between Class and Instance.
 ### CALL_FUNCTION
 Before we step into `CALL_FUNCTION`, we have already done 
 ```Python
@@ -199,7 +199,7 @@ This instruction directly fetches constant _5_ from fastlocals where we store _5
 
 It's faster than `LOAD_CONST`.
 ### POP_TOP
-Here I want to explain how come is this wierd `POP_TOP` instead of talking how it works.
+Here I want to explain how come is this weird `POP_TOP` instead of talking how it works.
 
 Recall our code `foo(5)`, we didn't make use of the return value of `foo(5)`, which would become a garbage once it returned. However the [`CALL_FUNCTION`](#call_function) will push that value into value stack, so the interpreter will simply pop that out, decrease the refcount, so the GC modual can do its job.
 
@@ -211,6 +211,6 @@ To make it clear, we change our code to `a = foo(5)`, the bytecode will become:
 ```
 Instead of poping the value, the interpreter stored that value with a name.
 ## Conclusion
-The interpreter will eval a block of code within a frame. When we deined a function, the interpreter just make a function object from the code and do nothing but store that in the value stack. When we call the function, the interpreter will grab the function object and put that into a frame, then throw it to the interpreter.
+The interpreter will eval a block of code within a frame. When we defined a function, the interpreter just make a function object from the code and do nothing but store that in the value stack. When we call the function, the interpreter will grab the function object and put that into a frame, then throw it to the interpreter.
 
 It's a bit of like nested calling `PyEval_EvalFrameEx()`.
