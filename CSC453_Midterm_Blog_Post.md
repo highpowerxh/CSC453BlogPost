@@ -136,7 +136,7 @@ call_function(PyObject ***pp_stack, int oparg)
 	  ...
     PyObject **pfunc = (*pp_stack) - n - 1;// CSC253: skip args and get function "foo" (n is the num of args)
     if (PyCFunction_Check(func) && nk == 0) {
-        ...// CSC253: If func is build-in func, it goes through here.
+        ...// CSC253: If func is built-in func, it goes through here.
     } else {
         ...
             x = fast_function(func, pp_stack, n, na, nk);// CSC253: We step into this func
