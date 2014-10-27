@@ -27,12 +27,7 @@ If we compile this file in Python 2.7.8:
 ```Python
 >>> test_obj = compile(open('test.py').read(), 'test.py', 'exec')
 ```
-we can get a code object _test_obj_ represent the compiled code from **test.py**. The the bytecode is stored in
-```Python
->>> test_obj.co_code
-'d\x00\x00\x84\x00\x00Z\x00\x00e\x00\x00d\x01\x00\x83\x01\x00\x01d\x02\x00S'
-```
-The human-friendly disassambled bytecode is:
+we can get a code object _test_obj_ represent the compiled code from **test.py**. The the bytecode is stored in _co_code_
 ```Python
   1           0 LOAD_CONST               0 (<code object foo at 0x1004b9830, file "test.py", line 1>)
               3 MAKE_FUNCTION            0
@@ -47,11 +42,11 @@ The human-friendly disassambled bytecode is:
 ```
 
 ## Purpose
-Via this example we want to go through how user-defined funtions work in the interpreter.
+Via this example we want to go through how user-defined functions work in the interpreter.
 So the highlighted part should be [`MAKE_FUNCTION`](#make_function) and [`CALL_FUNCTION`](#call_function)
 
 ## Execution
-In the main loop of the interpreter, it will simply load the code object (`LOAD_CONST`) which is stored in
+In the main loop of the interpreter, it will simply load the code object (`LOAD_CONST`), which is stored in
 ```Python
 >>> test_obj.co_consts
 (<code object foo at 0x1004b9830, file "test.py", line 1>, 5, None)
@@ -201,7 +196,7 @@ It's faster than `LOAD_CONST`.
 ### POP_TOP
 Here I want to explain how come is this weird `POP_TOP` instead of talking how it works.
 
-Recall our code `foo(5)`, we didn't make use of the return value of `foo(5)`, which would become a garbage once it returned. However the [`CALL_FUNCTION`](#call_function) will push that value into value stack, so the interpreter will simply pop that out, decrease the refcount, so the GC modual can do its job.
+Recall our code `foo(5)`, we didn't make use of the return value of `foo(5)`, which would become a garbage once it returned. However the [`CALL_FUNCTION`](#call_function) will push that value into value stack, so the interpreter will simply pop that out, decrease the refcount, so the GC module can do its job.
 
 To make it clear, we change our code to `a = foo(5)`, the bytecode will become:
 ```Python
@@ -209,7 +204,7 @@ To make it clear, we change our code to `a = foo(5)`, the bytecode will become:
 18 STORE_NAME               1 (a)
 21 LOAD_CONST               2 (None)
 ```
-Instead of poping the value, the interpreter stored that value with a name.
+Instead of popping the value, the interpreter stored that value with a name.
 ## Conclusion
 The interpreter will eval a block of code within a frame. When we defined a function, the interpreter just make a function object from the code and do nothing but store that in the value stack. When we call the function, the interpreter will grab the function object and put that into a frame, then throw it to the interpreter.
 
