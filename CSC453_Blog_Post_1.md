@@ -1,4 +1,33 @@
+#CS453 Final project proposal
+Dispy : Python Framework for Distributed and Parallel Computing
+##Group Member:
+Xi Jin & Hao Xu
+## Introduction
+Dispy is a Python framework for parallel execution of computations by distributing them across multiple processors in a single machine (SMP). It is implemented with asyncoro, which is an independent framework for asynchronous and concurrent programming with coroutines. Dispy itself is well suited for data parallel (SIMD) paradigm where a computation is evaluated with different (large) datasets independently with no communication among computation tasks. When there is some communications among workloads, we need asyncoro framework to help passing message. The asyncore is like a message passing model for communicating with client and other computation tasks.
+## Motivation
+
 The system of linear equations may be rewritten as:
 <img src="http://chart.googleapis.com/chart?cht=tx&chl=(D%2B\omega L) \mathbf{x} = \omega \mathbf{b} - [\omega U %2B (\omega-1) D ] \mathbf{x}" style="border:none;">.
 
-Then <img src="http://chart.googleapis.com/chart?cht=tx&chl=x^{(k%2B1)}_i  = {(1-\omega)x^{(k)}_i}%2B\frac{\omega}{a_{ii}} \left(b_i - \sum_{j%3Ci} a_{ij}x^{(k%2B1)}_j - \sum_{j%3Ei} a_{ij}x^{(k)}_j \right),\quad i=1,2,\ldots,n" style="border:none;"><p>
+Then <img src="http://chart.googleapis.com/chart?cht=tx&chl=x^{(k%2B1)}_i  = {(1-\omega)x^{(k)}_i}%2B\frac{\omega}{a_{ii}} \left(b_i - \sum_{j%3Ci} a_{ij}x^{(k%2B1)}_j - \sum_{j%3Ei} a_{ij}x^{(k)}_j \right),\quad i=1,2,\ldots,n" style="border:none;">
+
+## First Step
+Firstly, we will convert our original C program to Python version using dispy framework to gain parallelism. Since communications are required during the computation stage, we also need to apply asyncoro framework in our program.
+
+Then we can compare total number of lines, speedup, communication cost and other performance issues with original C program.
+
+At the same, we have to figure out how exactly dispy assigns the job, synchronize jobs and its internal mechanism. Additional, we will explore how to make some optimization in Python like aligning a data structure into exactly one or two cache line to avoid false sharing problem and how to reduce communication cost in Python (eg. apply high performance lock and barrier)
+
+##Reference
+[1] Dispy: http://dispy.sourceforge.net
+
+[2] Asyncoro: http://asyncoro.sourceforge.net/
+
+[3] Renato de Leone. Partially and totally asynchronous algorithms for linear complementarity problems. _Journal of optimization theory and applications_, 69(2):235–249, 1991.
+
+[4] R De Leone and Olvi L Mangasarian. Asynchronous parallel successive overrelaxation for the symmetric linear complementarity problem. _Mathematical Programming_, 42(1-3):347–361, 1988.
+
+[5] Olvi L Mangasarian. Solution of symmetric linear complementarity problems by iterative methods. _Journal of Optimization Theory and Applications_, 22(4):465–485, 1977.
+
+[6] Olvi L Mangasarian and R De Leone. Parallel successive overrelaxation methods for symmetric linear complementarity problems and linear programs. _Journal of Optimization Theory and Applications_, 54(3):437–446, 1987.
+
