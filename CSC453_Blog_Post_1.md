@@ -10,16 +10,14 @@ Solving linear system is a classical problem in many areas. Our main purpose is 
 This algorithm is a converging iterative process which can be implemented into synchronous or asynchronous version. For linear system: <img src="http://chart.googleapis.com/chart?cht=tx&chl=Ax=b" style="border:none;">. Assume <img src="http://chart.googleapis.com/chart?cht=tx&chl=A" style="border:none;"> can be decomposed into a diagonal component <img src="http://chart.googleapis.com/chart?cht=tx&chl=D" style="border:none;">, and strictly lower and upper triangular components <img src="http://chart.googleapis.com/chart?cht=tx&chl=L" style="border:none;"> and <img src="http://chart.googleapis.com/chart?cht=tx&chl=U" style="border:none;">: <img src="http://chart.googleapis.com/chart?cht=tx&chl=A=D%2BL%2BU" style="border:none;">. 
 
 The system of linear equations may be rewritten as:
-
-<img src="http://chart.googleapis.com/chart?cht=tx&chl=(D%2B\omega L) \mathbf{x} = \omega \mathbf{b} - [\omega U %2B (\omega-1) D ] \mathbf{x}" style="border:none;">.
+<p align="center"><img src="http://chart.googleapis.com/chart?cht=tx&chl=(D%2B\omega L) \mathbf{x} = \omega \mathbf{b} - [\omega U %2B (\omega-1) D ] \mathbf{x}" style="border:none;"></p>
 
 Then 
-
-<img src="http://chart.googleapis.com/chart?cht=tx&chl=x^{(k%2B1)}_i  = {(1-\omega)x^{(k)}_i}%2B\frac{\omega}{a_{ii}} \left(b_i - \sum_{j%3Ci} a_{ij}x^{(k%2B1)}_j - \sum_{j%3Ei} a_{ij}x^{(k)}_j \right),\quad i=1,2,\ldots,n" style="border:none;">
+<p align="center"><img src="http://chart.googleapis.com/chart?cht=tx&chl=x^{(k%2B1)}_i  = {(1-\omega)x^{(k)}_i}%2B\frac{\omega}{a_{ii}} \left(b_i - \sum_{j%3Ci} a_{ij}x^{(k%2B1)}_j - \sum_{j%3Ei} a_{ij}x^{(k)}_j \right),\quad i=1,2,\ldots,n" style="border:none;"></p>
 
 We now focus on asynchronous version in Python with the help of dispy and asyncoro. Also we would like to know how Python could be a concise language than C and what the performance difference between them is.
 ## First Step
-Firstly, we will convert our original C program to Python version using dispy framework to gain parallelism. Since communications are required during the computation stage, we also need to apply asyncoro framework in our program.
+Firstly, we will convert our existing C program to Python version using dispy framework to gain parallelism. Since communications are required during the computation stage, we also need to apply asyncoro framework in our program.
 
 Then we can compare total number of lines, speedup, communication cost and other performance issues with original C program.
 
