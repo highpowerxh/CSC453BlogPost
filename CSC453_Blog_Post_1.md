@@ -21,7 +21,7 @@ Firstly, we will convert our existing C program to Python version using dispy fr
 
 Then we can compare total number of lines, speedup, communication cost and other performance issues with original C program.
 
-At the same, we have to figure out how exactly dispy assigns the job, synchronize jobs and its internal mechanism. Additional, we will explore how to make some optimization in Python like aligning a data structure into exactly one or two cache line to avoid false sharing problem and how to reduce communication cost in Python (eg. apply high performance lock and barrier)
+At the same time, we have to figure out how exactly dispy assigns the job, synchronize jobs and its internal mechanism. Additional, we will explore how to make some optimization in Python like aligning a data structure into exactly one or two cache line to avoid false sharing problem and how to reduce communication cost in Python (eg. apply high performance lock and barrier)
 
 ##Reference
 [1] Dispy: http://dispy.sourceforge.net
