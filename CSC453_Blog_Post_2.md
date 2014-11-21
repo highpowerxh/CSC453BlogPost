@@ -1,4 +1,4 @@
-#CS453 Final Project Update
+#CSC453 Final Project Update
 Dispy : Python Framework for Distributed and Parallel Computing
 ##Group Member
 Xi Jin & Hao Xu
@@ -49,3 +49,29 @@ if __name__ == '__main__':
     cluster.stats()
 ```
 ![Alt text](Images/screenshot_test.jpg "Testing")
+##Scipy and Numpy
+
+In order to perform efficient numerical computation, especially for large size matrix, we decide to use scipy and numpy. The way we install them is to build anaconda environment which automatically contains hundreds of usefull package. We plan to replace all the matrix multiplication, transposition and division with corresponding numpy functions.
+
+##Algorithm
+```
+Solving a linear system : AX=b (A is PSD matrix)
+Algorithm:
+Inputs: A, b, ω (relaxation factor), X
+Choose an initial guess X to the solution
+repeat until convergence
+for i from 1 until n do
+	tmp = 0
+	old= X[i];
+	for j from 1 until n do
+		if j != i then
+ 			tmp = tmp + a[i][j] X[j] // numpy function applied here to gain efficiency
+	end (j-loop)
+ 	X[i] = (1 - ω)*old+ ω / a[i][i] (bi - tmp)
+end (i-loop)
+check if convergence is reached
+end (repeat)
+```
+##Challenges:
+The biggest problem is the memory contention. The workload should be split to different local memory if there are more than 1 node (memory controller) and manage appropriately.
+Dispy acts like MPI, we are trying to gain more locality while its running paralleled. 
