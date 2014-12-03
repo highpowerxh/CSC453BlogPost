@@ -53,6 +53,9 @@ if __name__ == '__main__':
 ## Complete Code
 Please see [here](https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.py)
 
+Flow Chart:
+![Alt text](Images/Flowchart.png "Flow Chart")
+
 ## Performance Testing
 **Comparison with C is in progress**
 
