@@ -54,7 +54,7 @@ if __name__ == '__main__':
 Please see [here](https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.py)
 
 ## Performance Testing
-**Comparison with C is in progress** **
+**Comparison with C is in progress**
 
 Here is a screenshot of a single run:
 
