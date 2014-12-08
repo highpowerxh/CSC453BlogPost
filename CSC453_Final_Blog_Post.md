@@ -2,6 +2,20 @@
 Dispy : Python Framework for Distributed and Parallel Computing
 ##Group Member
 Xi Jin & Hao Xu
+
+- [Introduction](#introduction)
+- [Motivation](#motivation)
+- [Challenge](#challenge)
+- [Installation and Components Introduction](#installation-and-components-introduction)
+- [Framework](#framework)
+- [Algorithm](#algorithm)
+- [Complete Code](#complete-code)
+- [Performance Test](#performance-test)
+- [Conclusion](#conclusion)
+    - [cons:](#cons)
+    - [pros:](#pros)
+- [Reference](#reference)
+
 ## Introduction
 `Dispy` is a Python framework for parallel execution of computations by distributing them across multiple processors in a single machine (SMP). It is implemented with asyncoro, which is an independent framework for asynchronous and concurrent programming with coroutines. Dispy itself is well suited for data parallel (SIMD) paradigm where a computation is evaluated with different (large) datasets independently with no communication among computation tasks. When there is some communications among workloads, we need asyncoro framework to help passing message. The asyncore is like a message passing model for communicating with client and other computation tasks.
 
