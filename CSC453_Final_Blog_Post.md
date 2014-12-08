@@ -3,7 +3,17 @@ Dispy : Python Framework for Distributed and Parallel Computing
 ##Group Member
 Xi Jin & Hao Xu
 ## Introduction
-`Dispy` is a Python framework for parallel execution of computations by distributing them across multiple processors in a single machine (SMP). It is implemented with `asyncoro`, which is an independent framework for asynchronous and concurrent programming with coroutines. Dispy itself is well suited for data parallel (SIMD) paradigm where a computation is evaluated with different (large) datasets independently with no communication among computation tasks. When there is some communications among workloads, we need asyncoro framework to help passing message. The asyncore is like a message passing model for communicating with client and other computation tasks.
+`Dispy` is a Python framework for parallel execution of computations by distributing them across multiple processors in a single machine (SMP). It is implemented with asyncoro, which is an independent framework for asynchronous and concurrent programming with coroutines. Dispy itself is well suited for data parallel (SIMD) paradigm where a computation is evaluated with different (large) datasets independently with no communication among computation tasks. When there is some communications among workloads, we need asyncoro framework to help passing message. The asyncore is like a message passing model for communicating with client and other computation tasks.
+
+`asyncoro` is a Python framework for asynchronous, concurrent, distributed programming using generator functions, asynchronous completions and message passing. asyncoro API can be used to create coroutines with generator functions, similar to the way threads are created with functions with Python’s threading module. Thus, programs developed with asyncoro have same logic and structure as programs with threads, except for a few syntactic changes - mostly using yield with asynchronous completions that give control to asyncoro’s scheduler, which interleaves executions of generators, similar to the way an operating system executes multiple processes.
+
+`NumPy` is the fundamental package for scientific computing with Python. It contains among other things:
+- a powerful N-dimensional array object
+- sophisticated (broadcasting) functions
+- tools for integrating C/C++ and Fortran code
+- useful linear algebra, Fourier transform, and random number capabilities
+
+Besides its obvious scientific uses, NumPy can also be used as an efficient multi-dimensional container of generic data. Arbitrary data-types can be defined. This allows NumPy to seamlessly and speedily integrate with a wide variety of databases.
 ## Motivation
 
 Solving linear system is a classical problem in many areas. Our main purpose is to solve a linear system by using successive over-relaxation algorithm.
