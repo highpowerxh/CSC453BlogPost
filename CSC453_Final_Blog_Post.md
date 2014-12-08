@@ -99,7 +99,7 @@ end (repeat)
 ```
 ## Complete Code
 Please see
-[C Version]((https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.c)
+[C Version](https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.c)
 [Python Version](https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.py)
 
 System Design Chart:
