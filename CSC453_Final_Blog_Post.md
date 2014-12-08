@@ -1,4 +1,4 @@
-#CS453 Final Project Update
+#CS453 Final Project Report
 Dispy : Python Framework for Distributed and Parallel Computing
 ##Group Member
 Xi Jin & Hao Xu
