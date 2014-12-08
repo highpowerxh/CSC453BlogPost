@@ -13,8 +13,8 @@ Xi Jin & Hao Xu
 - [Complete Code](#complete-code)
 - [Performance Test](#performance-test)
 - [Summary](#summary)
-    - [cons](#cons)
-    - [pros](#pros)
+    - [Cons](#cons)
+    - [Pros](#pros)
 - [Reference](#reference)
 
 ## Introduction
