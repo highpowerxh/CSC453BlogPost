@@ -100,10 +100,11 @@ end (repeat)
 ## Complete Code
 Please see
 [C Version](https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.c),
-[Python Version](https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.py) ([Older Version](https://github.com/highpowerxh/CSC453BlogPost/blob/8bda86c02275174d734b0b35c4dc378102e4a54e/ASOR.py))
+[Python Version](https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.py) (Updated, [Older Version](https://github.com/highpowerxh/CSC453BlogPost/blob/8bda86c02275174d734b0b35c4dc378102e4a54e/ASOR.py))
 
-System Design Chart:
-![Alt text](Images/Flowchart.png "Flow Chart")
+System Design Chart (Updated, [Older Version](Images/Flowchart.png)):
+
+![Alt text](Images/systemchart.png "System Design Chart")
 
 ## Performance Test
 Testing Platform
