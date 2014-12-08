@@ -136,6 +136,21 @@ Testing Platform
 <a href="http://jsfiddle.net/7s6s9cxc/1/embedded/result/" target="_blank">![Alt text](Images/chart3k.png "Click to interact")</a>
 <a href="http://jsfiddle.net/cjfo45qL/1/embedded/result/" target="_blank">![Alt text](Images/speedup3k.png "Click to interact")</a>
 Note: We didn't find SMP support in Dispy as it described in their document. Actually, it provides an MPI-like parallelism, so data does not have better locality performance. The final comparsion will seem to be a little unfair for dispy since the C version is using pthread which has better memory locality. But dispy version has only about 170 lines of code after clean up compare to the 470 lines of C version.
+##Conclusion
+Unfortunately, dispy didn't performance quite well as we expect.
+###Cons:
+1. Dispy is memory passing model among processes. Unlike share memory model, in order to share result vector X, the program actually calls pipe() using asyn socket communication. That's why we observe the speedup is quite linear within 10 processes but decreases dramatically after that. Also Python version even runs faster than C version with the 1000x1000 matrix test file but suffers from memory passing latency when dealing with large file.
+
+2. Dispy didn't support large file input. we have tried 5000x5000 matrix but failed. The reason is that if client doesn't send that huge chunk of initialized data to workers, workers will throw timeout error.
+
+3. Dispy's sending provisional result method is terrible. There is no blocking-style handler and worker won't know if their request was handled or waits on the queue so if we send result frequently, the client will die. That's the reason we give up old version.
+
+###Pros:
+1. Numpy works well and even beat C version with the 1000x1000 matrix
+
+2. Python version only need less than half of the code comparing to C version
+
+3. Program can be distributed to all CPU on network.
 
 ##Reference
 [1] Dispy: http://dispy.sourceforge.net
