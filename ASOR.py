@@ -8,7 +8,7 @@ def setup():
     lock_token = multiprocessing.Lock()
     lock_spinning = multiprocessing.Lock()
     lock_convergence = multiprocessing.Lock()
-    MAX_NSIZE = 1000
+    MAX_NSIZE = 1000 #need to be changed according to the input matrix size, can't be passed in as an argument
     MAX_NJOB = 24
 # Shared memory among processes in each of the nodes
     X = multiprocessing.sharedctypes.RawArray(ctypes.c_double,MAX_NSIZE)
