@@ -105,7 +105,12 @@ Please see
 System Design Chart:
 ![Alt text](Images/Flowchart.png "Flow Chart")
 
-## Performance Testing
+## Performance Test
+Testing Platform
+|   Node Name   |        CPU       |                Details               |Memory|
+|:-------------:|:----------------:|:------------------------------------:|:----:|
+|  node2x12x1a  |2 AMD Opteron 6172|Opteron, 2.1GHz, 12-Cores x 1-"Thread"| 16GB |
+
 <a href="http://jsfiddle.net/qt9ot5s2/1/embedded/result/" target="_blank">![Alt text](Images/chart2k.png "Click to interact")</a>
 <a href="http://jsfiddle.net/urb53j1v/2/embedded/result/" target="_blank">![Alt text](Images/speedup2k.png "Click to interact")</a>
 
