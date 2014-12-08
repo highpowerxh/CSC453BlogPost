@@ -111,11 +111,13 @@ Testing Platform
 |   Node Name   |        CPU       |                Details               |Memory|
 |:-------------:|:----------------:|:------------------------------------:|:----:|
 |  node2x12x1a  |2 AMD Opteron 6172|Opteron, 2.1GHz, 12-Cores x 1-"Thread"| 16GB |
-
+<a href="http://jsfiddle.net/xxfmh4hk/3/embedded/result/" target="_blank">![Alt text](Images/chart1k.png "Click to interact")</a>
+<a href="http://jsfiddle.net/83w7ytrz/2/embedded/result/" target="_blank">![Alt text](Images/speedup1k.png "Click to interact")</a>
 <a href="http://jsfiddle.net/qt9ot5s2/1/embedded/result/" target="_blank">![Alt text](Images/chart2k.png "Click to interact")</a>
 <a href="http://jsfiddle.net/urb53j1v/2/embedded/result/" target="_blank">![Alt text](Images/speedup2k.png "Click to interact")</a>
-
-Note: We didn't find SMP support in Dispy as it described in their document. Actually, it provides an MPI-like parallelism, so data does not have better locality performance. The final comparsion will seem to be a little unfair for dispy since the C version is using pthread which has better memory locality. But dispy version has only about 150 lines of code after clean up compare to the 600 lines of C version.
+<a href="http://jsfiddle.net/7s6s9cxc/1/embedded/result/" target="_blank">![Alt text](Images/chart3k.png "Click to interact")</a>
+<a href="http://jsfiddle.net/cjfo45qL/1/embedded/result/" target="_blank">![Alt text](Images/speedup3k.png "Click to interact")</a>
+Note: We didn't find SMP support in Dispy as it described in their document. Actually, it provides an MPI-like parallelism, so data does not have better locality performance. The final comparsion will seem to be a little unfair for dispy since the C version is using pthread which has better memory locality. But dispy version has only about 170 lines of code after clean up compare to the 470 lines of C version.
 
 ##Reference
 [1] Dispy: http://dispy.sourceforge.net
