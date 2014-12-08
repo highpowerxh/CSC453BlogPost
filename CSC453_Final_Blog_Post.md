@@ -106,8 +106,8 @@ System Design Chart:
 ![Alt text](Images/Flowchart.png "Flow Chart")
 
 ## Performance Testing
-[![Alt text](Images/chart2k.png "Testing")](http://jsfiddle.net/qt9ot5s2/1/embedded/result/)
-[![Alt text](Images/speedup2k.png "Testing")](http://jsfiddle.net/urb53j1v/2/embedded/result/)
+<a href="http://jsfiddle.net/qt9ot5s2/1/embedded/result/" target="_blank">![Alt text](Images/chart2k.png "Click to interact")</a>
+<a href="http://jsfiddle.net/urb53j1v/2/embedded/result/" target="_blank">![Alt text](Images/speedup2k.png "Click to interact")</a>
 
 Note: We didn't find SMP support in Dispy as it described in their document. Actually, it provides an MPI-like parallelism, so data does not have better locality performance. The final comparsion will seem to be a little unfair for dispy since the C version is using pthread which has better memory locality. But dispy version has only about 150 lines of code after clean up compare to the 600 lines of C version.
 
