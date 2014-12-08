@@ -11,7 +11,7 @@ Xi Jin & Hao Xu
 - [Algorithm](#algorithm)
 - [Complete Code](#complete-code)
 - [Performance Test](#performance-test)
-- [Conclusion](#conclusion)
+- [Summary](#summary)
     - [cons:](#cons)
     - [pros:](#pros)
 - [Reference](#reference)
@@ -150,7 +150,7 @@ Testing Platform
 <a href="http://jsfiddle.net/7s6s9cxc/1/embedded/result/" target="_blank">![Alt text](Images/chart3k.png "Click to interact")</a>
 <a href="http://jsfiddle.net/cjfo45qL/1/embedded/result/" target="_blank">![Alt text](Images/speedup3k.png "Click to interact")</a>
 Note: We didn't find SMP support in Dispy as it described in their document. Actually, it provides an MPI-like parallelism, so data does not have better locality performance. The final comparsion will seem to be a little unfair for dispy since the C version is using pthread which has better memory locality. But dispy version has only about 170 lines of code after clean up compare to the 470 lines of C version.
-##Conclusion
+##Summary
 Unfortunately, dispy didn't performance quite well as we expect.
 ###Cons:
 1. Dispy is memory passing model among processes. Unlike share memory model, in order to share result vector X, the program actually calls pipe() using asyn socket communication. That's why we observe the speedup is quite linear within 10 processes but decreases dramatically after that. Also Python version even runs faster than C version with the 1000x1000 matrix test file but suffers from memory passing latency when dealing with large file.
