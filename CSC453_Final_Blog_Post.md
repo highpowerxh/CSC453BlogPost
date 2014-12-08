@@ -98,22 +98,19 @@ check if convergence is reached
 end (repeat)
 ```
 ## Complete Code
-Please see [here](https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.py)
+Please see
+[C Version]((https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.c)
+[Python Version](https://github.com/highpowerxh/CSC453BlogPost/blob/master/ASOR.py)
 
-Flow Chart:
+System Design Chart:
 ![Alt text](Images/Flowchart.png "Flow Chart")
 
 ## Performance Testing
-<iframe width="600" height="371" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/1qa5pDeNa5kOfO1qysL1jq8sD9LMef67zhscOidCFW_I/pubchart?oid=894190270&amp;format=interactive"></iframe>
-**Comparison with C is in progress**
-
-Here is a screenshot of a single run:
-
-![Alt text](Images/ASOR_test.jpg "Testing")
+[![Alt text](Images/chart2k.png "Testing")](http://jsfiddle.net/qt9ot5s2/1/embedded/result/)
+[![Alt text](Images/speedup2k.png "Testing")](http://jsfiddle.net/urb53j1v/2/embedded/result/)
 
 Note: We didn't find SMP support in Dispy as it described in their document. Actually, it provides an MPI-like parallelism, so data does not have better locality performance. The final comparsion will seem to be a little unfair for dispy since the C version is using pthread which has better memory locality. But dispy version has only about 150 lines of code after clean up compare to the 600 lines of C version.
 
-We'll test dispy version on multipy machines if possible
 ##Reference
 [1] Dispy: http://dispy.sourceforge.net
 
