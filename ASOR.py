@@ -1,32 +1,36 @@
-import dispy, sys, math, time
+import dispy, sys, math, time, numpy
 
 def setup():
     import multiprocessing, multiprocessing.sharedctypes
     import ctypes
-    global X, flags,token
+    global X, flags,token,spinning,convergence
     lock_flags = multiprocessing.Lock()
     lock_token = multiprocessing.Lock()
+    lock_spinning = multiprocessing.Lock()
+    lock_convergence = multiprocessing.Lock()
     MAX_NSIZE = 1000
+    MAX_NJOB = 24
 # Shared memory among processes in each of the nodes
     X = multiprocessing.sharedctypes.RawArray(ctypes.c_double,MAX_NSIZE)
     flags = multiprocessing.sharedctypes.Array(ctypes.c_int,MAX_NSIZE, lock = lock_flags)
+    spinning = multiprocessing.sharedctypes.Array(ctypes.c_int,MAX_NJOB, lock = lock_spinning)
     token = multiprocessing.sharedctypes.Array(ctypes.c_int,1, lock = lock_token)
     token[0] = 0
+    convergence = multiprocessing.sharedctypes.Array(ctypes.c_int,2, lock = lock_convergence) #[0]=global converge flag [1] = num_ite
     return 0
-
-def cleanup():
-    del globals()['X','flags','token']    
 
 # 'compute' is distributed to each node running 'dispynode';
 # runs on each processor in each of the nodes
 def compute(start,end,nsize,index,job_num,matrix,R):
     import os, time,sys, numpy
-    global X, flags,token
+    global X, flags,token, spinning,convergence
     l2norm = 0.0    # SUM((X_new - X_old)^2)
     ite = 0         #iteration in each of the nodes
-    EPS = 1e-8      # convergence criteria
+    EPS = 1e-5      # convergence criteria
+    total_time = 0.0
     compute_time = 0.0
     syn_time = 0.0
+    converge_time = 0.0
 # Numpy initialization
     matrix_num = numpy.array(matrix).reshape(nsize,nsize)
     R_num = numpy.array(R).reshape(nsize,1)
@@ -36,9 +40,12 @@ def compute(start,end,nsize,index,job_num,matrix,R):
         flags[index] = 1
         return [index,os.getpid()]
 
-# kernel algorithm          
+# kernel algorithm               
 #numpy style
-    while True:
+    tmp_total = time.time()
+    while convergence[0] == 0:
+        while spinning[index] == 1:
+            pass
         l2norm = 0.0
         ite += 1
         tmp_time = time.time()
@@ -55,49 +62,38 @@ def compute(start,end,nsize,index,job_num,matrix,R):
             flags[index] = 0 
 #Send provisional result to client
         if flags[index] == 1 and token[0] == index and sum(flags) == job_num :
-            dispy_provisional_result((1,index,start,end,X[start:end+1],ite,compute_time,syn_time))
+            tmp_converge = time.time()
             token[0] = (token[0] + 1) % job_num    
-            time.sleep(1)
+            for i in range(job_num):
+                spinning[i] = 1
+            while sum(spinning) != job_num:
+                pass
+        #global convergence test (break locality)
+            l2norm = 0.0
+            convergence[1] += 1
+            for i in range(0,nsize):
+                old = X_num[i]      
+                tmp = numpy.dot(X_num,matrix_num[i].reshape(nsize,1)) - matrix_num[i][i]*X_num[i]
+                X_num[i] = 1.0/float(matrix_num[i][i])*(R_num[i]-tmp[0])
+                l2norm += pow(old-X_num[i], 2)
+            if l2norm < EPS:
+                convergence[0] = 1
+                for i in range(job_num):
+                    spinning[i] = 0
+                total_time = time.time() - tmp_total
+                converge_time += time.time() - tmp_converge
+                return  [1,index,start,end,X[start:end+1],ite,compute_time,syn_time,convergence[1],total_time,converge_time,total_time-compute_time-converge_time]
+            else:
+                for i in range(job_num):
+                    spinning[i] = 0
+                    flags[i] = 0
+            converge_time += time.time() - tmp_converge
+            #dispy_provisional_result((1,index,start,end,X[start:end+1],ite,compute_time,syn_time,spinning[index]))
+            #time.sleep(1)
+                        
         #syn_time += time.time() - tmp_time
-    return  [os.getpid(),index,start,end,X_num[start:end+1],compute_time,syn_time]
-    
-def job_callback(job):
-    import numpy,os
-    global result,ready,job_num
-    if job.status == dispy.DispyJob.ProvisionalResult:
-#parse result
-        ready[job.result[1]] = 1
-        if sum(ready) != job_num:
-            return 0
-        local_ite[0] += 1
-        result[job.result[2]:job.result[3]+1] = job.result[4] 
-        ite[job.result[1]] = job.result[5] 
-        compute_time[job.result[1]] = job.result[6] 
-        syn_time[job.result[1]] = job.result[7] 
-        
-# numpy initialization
-        matrix_num = numpy.array(matrix).reshape(nsize,nsize)
-        R_num = numpy.array(R).reshape(nsize,1)
-        X_num = numpy.array(result[0:nsize]).reshape(nsize,1)
-
-# Run convergence test (numpy style)
-        l2norm = 0.0
-        for i in range(nsize):
-            old = result[i]
-            tmp = numpy.dot(matrix_num[i],X_num) - matrix_num[i][i]*X_num[i]
-            fresh = 1.0/float(matrix_num[i][i])*(R_num[i]-tmp[0])
-            err = pow(old-fresh, 2)
-            if err >= EPS:
-                return 0
-            l2norm += err
-
-        print '@@',job.result[1],l2norm,local_ite[0]
-        if l2norm < EPS:    
-            for j in jobs:
-                if j.status in [dispy.DispyJob.Created, dispy.DispyJob.Running,
-                                dispy.DispyJob.ProvisionalResult]:
-                    cluster.cancel(j)
-          
+    total_time = time.time() - tmp_total
+    return  [1,index,start,end,X[start:end+1],ite,compute_time,syn_time,convergence[1],total_time,converge_time,total_time-compute_time-converge_time]
 
 
 if __name__ == '__main__':
@@ -116,7 +112,7 @@ if __name__ == '__main__':
         exit()
     local_ite = [0]
     nsize = int(data.readline().split()[0])
-    EPS = 1e-8
+    EPS = 1e-5
     done = 0
     matrix = [0 for n in range(nsize*nsize)]
     R = [ 0 for n in range(nsize)]
@@ -128,22 +124,24 @@ if __name__ == '__main__':
             done = 1
         else:
             matrix[(int(line.split()[0])-1)*nsize+(int(line.split()[1])-1)] = float(line.split()[2]) 
-    X_ = [n for n in range(1,nsize+1)]  
-    for i in range(nsize) :
-        for j in range(nsize) :
-            R[i] += X_[j]*matrix[i*nsize+j]            
-
+    print 'Finish reading file'
+    X_ = numpy.array([n for n in range(1,nsize+1)]).reshape(nsize,1)
+    matrix_ = numpy.array(matrix).reshape(nsize,nsize)
+    R_ = numpy.dot(matrix_,X_).reshape(1,nsize)
+    R = R_.tolist()
 #init parameters
     job_num = int(argv[1])
     ready = [ 0 for n in range(job_num)]
     ite = [ 0 for n in range(job_num)]
+    total_time = [ 0 for n in range(job_num)]
     compute_time = [ 0 for n in range(job_num)]
+    convergence_time = [ 0 for n in range(job_num)]
     syn_time = [ 0 for n in range(job_num)]
     workload = int(math.ceil(float(nsize)/float(job_num)))
     
-    print 'Finish reading file'
+    print 'Finish creating matrix'
 #Create job cluster
-    cluster = dispy.JobCluster(compute,setup=setup,cleanup=cleanup,callback=job_callback)
+    cluster = dispy.JobCluster(compute,setup=setup)
       
 #Assign jobs
     jobs = []
@@ -159,12 +157,22 @@ if __name__ == '__main__':
     cluster.wait()
     for job in jobs:
         ret = job()
+        local_ite[0] = ret[8]
+        ite[ret[1]] = ret[5] 
+        result[ret[2]:ret[3]+1] = ret[4] 
+        total_time[ret[1]] = ret[9]
+        compute_time[ret[1]] = ret[6]
+        convergence_time[ret[1]] = ret[10] 
+        syn_time[ret[1]] = ret[11] 
     cluster.stats()
     output = open('ASOR_Result','w')
     for ss in result:
         output.write(str(ss)+'\n')
     print 'Results save to "ASOR_Result"'
-    print '#Convergence Test:',local_ite[0]
-    print '#Iteration on each node:',ite
-    print 'Computation cost on each node:',compute_time
-    print 'Syn cost on each node:',syn_time
+    print 'Number of Global Convergence Test:',local_ite[0]
+    print 'Number of Iteration on each node:',ite
+    id = total_time.index(max(total_time))
+    print 'Total time cost:',total_time[id]
+    print 'Computation cost:',compute_time[id]
+    print 'Global convergence test cost:',convergence_time[id]
+    print 'Syn cost:',syn_time[id]
