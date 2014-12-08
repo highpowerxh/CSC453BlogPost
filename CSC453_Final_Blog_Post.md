@@ -25,7 +25,14 @@ The system of linear equations may be rewritten as:
 Then 
 <p align="center"><img src="http://chart.googleapis.com/chart?cht=tx&chl=x^{(k%2B1)}_i  = {(1-\omega)x^{(k)}_i}%2B\frac{\omega}{a_{ii}} \left(b_i - \sum_{j%3Ci} a_{ij}x^{(k%2B1)}_j - \sum_{j%3Ei} a_{ij}x^{(k)}_j \right),\quad i=1,2,\ldots,n" style="border:none;"></p>
 
-We now focus on asynchronous version in Python with the help of dispy and asyncoro. Also we would like to know how Python could be a concise language than C and what the performance difference between them is.
+It proved to be always converged if the matrix is positive semi-definite.
+The synchronous version requires all processes stop and share result at the end of each iteration. It gains benefit of running minimum number of iteration and being easy to control but suffers from high communication cost.
+
+Alternatively, we can build asynchronous version that all processes keep running on their own workload. An observer will check if the global converge point is reached and tell all processes to stop. This method will reduce synchronous cost to minimum but it increases the number of iteration to finish the job.
+
+We now focus on asynchronous version in Python with the help of dispy and asyncoro. Dispy is an ideal platform for our problem because it has a major feature that workers can send back provisional result while they can continue running and the client will decide to accept these sub-optimized result. Another intereting point is that numpy computation is much faster than normal operation and we wish to import it in our program. Also we would like to know how Python could be a concise language than C and what the performance difference between them is.
+##Challenge
+As the number of thread/process increasing, one major problem is that there will be more cache invalidation and writeback inside memory system. It will add latency to computation. Also the machine we use is node2x12x1a which is AMD OPTERON 12 core X2, two sockets, four memory controller machine, the socket to socket latency cannot be ignored. 
 ## Installation and Components Introduction
 Since we use Python 2.7.8 in this project. We can install Dispy with:
 ```Bash
