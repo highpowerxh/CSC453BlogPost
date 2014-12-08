@@ -107,6 +107,7 @@ System Design Chart:
 
 ## Performance Test
 Testing Platform
+
 |   Node Name   |        CPU       |                Details               |Memory|
 |:-------------:|:----------------:|:------------------------------------:|:----:|
 |  node2x12x1a  |2 AMD Opteron 6172|Opteron, 2.1GHz, 12-Cores x 1-"Thread"| 16GB |
