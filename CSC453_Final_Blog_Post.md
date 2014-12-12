@@ -150,6 +150,9 @@ Testing Platform
 <a href="http://jsfiddle.net/urb53j1v/2/embedded/result/" target="_blank">![Alt text](Images/speedup2k.png "Click to interact")</a>
 <a href="http://jsfiddle.net/7s6s9cxc/1/embedded/result/" target="_blank">![Alt text](Images/chart3k.png "Click to interact")</a>
 <a href="http://jsfiddle.net/cjfo45qL/1/embedded/result/" target="_blank">![Alt text](Images/speedup3k.png "Click to interact")</a>
+For the small size of sample, our python implementation beats C version a bit because numpy did a lot cache and optimization. But python version's performance drops dramatically after increasing number of workers and size of sample.
+Since this is a memory pass model that worker shares results through underlying pipe function, the increasing size and number of processes add much more memory communication than our C version.
+
 Note: We didn't find SMP support in Dispy as it described in their document. Actually, it provides an MPI-like parallelism, so data does not have better locality performance. The final comparsion will seem to be a little unfair for dispy since the C version is using pthread which has better memory locality. But dispy version has only about 170 lines of code after clean up compare to the 470 lines of C version.
 ##Summary
 Unfortunately, dispy didn't performance quite well as we expect.
